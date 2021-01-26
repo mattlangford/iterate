@@ -26,12 +26,21 @@ struct Enumerate {
     using iterator = EnumerateIterator<IteratorType<Container>>;
     iterator begin() const { return iterator{0, container.begin()}; }
     iterator end() const { return iterator{0, container.end()}; }
-    Container& container;
+    Container &container;
+};
+template <typename Container>
+struct EnumerateCopy {
+    using iterator = EnumerateIterator<IteratorType<Container>>;
+    iterator begin() { return iterator{0, container.begin()}; }
+    iterator end() { return iterator{0, container.end()}; }
+    Container container;
 };
 }  // namespace detail
 
 ///
 /// @brief Main interfaces
+///
+/// NOTE: These will take const references as well, since the Container will be a const Container
 ///
 template <typename Container>
 detail::Enumerate<Container> enumerate(Container &container) {
@@ -39,6 +48,10 @@ detail::Enumerate<Container> enumerate(Container &container) {
 }
 template <typename Container>
 detail::Enumerate<Container> enumerate(Container &&container) {
+    return {container};
+}
+template <typename Container>
+detail::EnumerateCopy<Container> enumerate_copy(const Container &container) {
     return {container};
 }
 }  // namespace it
