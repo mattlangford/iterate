@@ -1,0 +1,1 @@
+build --cxxopt="-ferror-limit=1"
