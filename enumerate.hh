@@ -40,9 +40,6 @@ struct Enumerate {
     using reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::reverse_iterator>;
     using const_reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
 
-    using value_type = std::pair<size_t, ReferenceType<iterator>>;
-    using reference = std::reference_wrapper<value_type>;
-
     iterator begin() { return {0, container.begin()}; }
     iterator end() { return {container.size(), container.end()}; }
     const_iterator cbegin() const { return {0, container.cbegin()}; }
@@ -63,9 +60,6 @@ struct Enumerate<const Container &> {
     using const_iterator = EnumerateIterator<typename std::decay_t<Container>::const_iterator>;
     using reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
     using const_reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
-
-    using value_type = std::pair<size_t, ReferenceType<iterator>>;
-    using reference = std::reference_wrapper<value_type>;
 
     iterator begin() const { return {0, container.begin()}; }
     iterator end() const { return {container.size(), container.end()}; }
