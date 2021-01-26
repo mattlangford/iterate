@@ -77,7 +77,7 @@ detail::Enumerate<Container &> enumerate(Container &container) {
     return {container};
 }
 template <typename Container>
-detail::Enumerate<Container> enumerate(Container &&container) {
+detail::Enumerate<Container &> enumerate(Container &&container) {
     return {container};
 }
 template <typename Container>
