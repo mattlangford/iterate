@@ -1,9 +1,10 @@
 #pragma once
 
-#include <iterator>
+#include "traits.hh"
 
 namespace it {
 namespace detail {
+
 template <typename It>
 struct EnumerateIterator {
     size_t index;
@@ -15,32 +16,32 @@ struct EnumerateIterator {
         return *this;
     }
 
-    bool operator!=(const EnumerateIterator &rhs) const {
-        return element != rhs.element;
-    }
+    bool operator!=(const EnumerateIterator &rhs) const { return element != rhs.element; }
 
-    using T = typename std::iterator_traits<It>::value_type;
-    std::pair<size_t, T &> operator*() const { return {index, *element}; }
+    // NOTE: This may return a const or mutable reference depending on the constness of the iterator
+    std::pair<size_t, ReferenceType<It>> operator*() const { return {index, *element}; }
 };
 
 template <typename Container>
 struct Enumerate {
-    using It = typename Container::iterator;
+    using iterator = EnumerateIterator<IteratorType<Container>>;
+    iterator begin() const { return iterator{0, begin_it}; }
+    iterator end() const { return iterator{0, end_it}; }
 
-    using iterator = EnumerateIterator<It>;
-    iterator begin() const { return EnumerateIterator<It>{0, start}; }
-    iterator end() const { return EnumerateIterator<It>{0, end}; }
-
-    It start;
-    It end;
+    IteratorType<Container> begin_it;
+    IteratorType<Container> end_it;
 };
 }  // namespace detail
 
 ///
-/// @brief Main interface
+/// @brief Main interfaces
 ///
 template <typename Container>
 detail::Enumerate<Container> enumerate(Container &container) {
     return {container.begin(), container.end()};
+}
+template <typename Container>
+detail::Enumerate<Container> enumerate(const Container &container) {
+    return {container.cbegin(), container.cend()};
 }
 }  // namespace it

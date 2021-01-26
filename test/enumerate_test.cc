@@ -15,3 +15,10 @@ TEST(Enumerate, reference) {
         EXPECT_EQ(i, test_type.i);
     }
 }
+
+TEST(Enumerate, const_reference) {
+    const std::vector<TestType> input{{0}, {1}, {2}};
+    for (auto [i, test_type] : it::enumerate(input)) {
+        EXPECT_EQ(i, test_type.i);
+    }
+}
