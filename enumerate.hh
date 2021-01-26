@@ -16,10 +16,9 @@ struct EnumerateIterator {
         return *this;
     }
 
-    bool operator!=(const EnumerateIterator &rhs) const { return element != rhs.element; }
-
     // NOTE: This may return a const or mutable reference depending on the constness of the iterator
     std::pair<size_t, ReferenceType<It>> operator*() const { return {index, *element}; }
+    bool operator!=(const EnumerateIterator &rhs) const { return element != rhs.element; }
 };
 
 template <typename Container>
