@@ -43,3 +43,17 @@ TEST(Iterate, zip_enumerate) {
         EXPECT_EQ(test_type1.i, test_type2.i);
     }
 }
+
+TEST(Iterate, too_much) {
+    const auto input = test_type_vector();
+    for (auto [e_1, e_2] : it::zip(it::enumerate(input), it::enumerate(it::zip(input, it::enumerate(input))))) {
+        const auto& [i1, in1] = e_1;
+        const auto& [i2, in2] = e_2;
+        EXPECT_EQ(i1, i2);
+
+        const auto& [in3, i_in4] = in2;
+        const auto& [i3, in5] = i_in4;
+        EXPECT_EQ(i3, i2);
+        EXPECT_EQ(in1.i, in5.i);
+    }
+}
