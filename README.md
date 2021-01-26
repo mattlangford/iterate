@@ -53,6 +53,16 @@ Each of the above take the vector by reference, but it works with const or rvalu
 for (auto [i, data_element] : it::enumerate_copy(data)) {...}
 ```
 
+Another cool feature of the library is `it::reverse()`. Instead of making copies, or dealing with awkward indexing, how about:
+```
+#include ""
+std::vector<DataType> process_backwards = ...;
+for (const DataType& data : it::reverse(process_backwards))
+{
+    process(data);
+}
+```
+
 ## Notes
  - The header `iterate.hh` includes all functionality
  - Generally functions and be composed: `it::enumerate(it::zip(a, b))`, for example.

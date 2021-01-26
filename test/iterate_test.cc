@@ -44,9 +44,26 @@ TEST(Iterate, zip_enumerate) {
     }
 }
 
+TEST(Iterate, zip_reverse) {
+    const auto input = test_type_vector();
+    auto r_input = input;
+    std::reverse(r_input.begin(), r_input.end());
+
+    // Since we just reversed, this should put things back in order
+    for (auto [t1, i_t2] : it::zip(it::reverse(r_input), it::enumerate(input))) {
+        const auto& [i, t2] = i_t2;
+        EXPECT_EQ(i, t1.i);
+        EXPECT_EQ(t1.i, t2.i);
+    }
+}
+
 TEST(Iterate, too_much) {
     const auto input = test_type_vector();
-    for (auto [e_1, e_2] : it::zip(it::enumerate(input), it::enumerate(it::zip(input, it::enumerate(input))))) {
+    auto r_input = input;
+    std::reverse(r_input.begin(), r_input.end());
+
+    for (auto [e_1, e_2] :
+         it::zip(it::enumerate(it::reverse(r_input)), it::enumerate(it::zip(input, it::enumerate(input))))) {
         const auto& [i1, in1] = e_1;
         const auto& [i2, in2] = e_2;
         EXPECT_EQ(i1, i2);
