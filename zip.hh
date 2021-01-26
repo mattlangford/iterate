@@ -8,6 +8,17 @@
 namespace it {
 namespace detail {
 
+/// Since other iterate iterators don't return references, we need this indirection instead of just std::ref() so we
+/// don't mix up values and references.
+template <typename T>
+std::reference_wrapper<T> maybe_ref(T &t) {
+    return t;
+}
+template <typename T>
+T maybe_ref(T &&t) {
+    return std::move(t);
+}
+
 template <typename... It>
 struct ZipIterator {
     std::tuple<It...> element;
@@ -26,9 +37,8 @@ struct ZipIterator {
     bool operator==(const ZipIterator &rhs) const { return element == rhs.element; }
     bool operator!=(const ZipIterator &rhs) const { return element != rhs.element; }
 
-    std::tuple<ReferenceType<It>...> operator*() const {
-        // return std::apply([](auto &...el) { return std::make_tuple(std::ref(*el)...); }, element);
-        return std::apply([](auto &...el) { return std::make_tuple(std::ref(*el)...); }, element);
+    reference operator*() const {
+        return std::apply([](auto &...el) { return std::make_tuple(maybe_ref(*el)...); }, element);
     }
 };
 
