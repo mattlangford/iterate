@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <map>
 #include <vector>
 
 namespace {
@@ -82,4 +83,12 @@ TEST(Zip, map_reference) {
         EXPECT_EQ(key, test_type2.j);
         EXPECT_EQ(value.i, test_type.i);
     }
+}
+
+TEST(Zip, different_sized) {
+    auto input1 = test_type_vector();
+    input1.emplace_back(TestType{7});
+    const auto input2 = test_type2_vector();
+
+    EXPECT_THROW(it::zip(input1, input2), std::runtime_error);
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdexcept>
 #include <tuple>
 
 #include "traits.hh"
@@ -16,9 +17,17 @@ struct ZipIterator {
         return *this;
     }
 
+    using difference_type = int;
+    using value_type = std::tuple<ReferenceType<It>...>;
+    using reference = value_type;
+    using pointer = std::add_pointer<value_type>;
+    using iterator_category = std::forward_iterator_tag;
+
+    bool operator==(const ZipIterator &rhs) const { return element == rhs.element; }
     bool operator!=(const ZipIterator &rhs) const { return element != rhs.element; }
 
     std::tuple<ReferenceType<It>...> operator*() const {
+        // return std::apply([](auto &...el) { return std::make_tuple(std::ref(*el)...); }, element);
         return std::apply([](auto &...el) { return std::make_tuple(std::ref(*el)...); }, element);
     }
 };
@@ -63,7 +72,14 @@ struct ContainerWrapper<const Container &> {
 
 template <typename... Container>
 struct Zip {
-    Zip(Container... containers) : holder{std::make_tuple(ContainerWrapper<Container>{containers}...)} {}
+    Zip(Container... containers) : holder{std::make_tuple(ContainerWrapper<Container>{containers}...)} {
+        // TODO: If the containers passed in are different sizes, things will go very poorly. Probably good to add a
+        // way to handle that better than exceptions?
+        auto throw_if_wrong_size = [this](const auto &el) {
+            if (el.container.size() != size()) throw std::runtime_error("Zipping with different sized inputs!");
+        };
+        std::apply([&](auto &...el) { (throw_if_wrong_size(el), ...); }, holder);
+    }
     std::tuple<ContainerWrapper<Container>...> holder;
 
     using iterator = ZipIterator<typename ContainerWrapper<Container>::iterator...>;
@@ -100,6 +116,7 @@ struct Zip {
     const_reverse_iterator crend() const {
         return {apply_to_each([](auto &el) { return el.crend(); })};
     }
+    size_t size() const { return std::get<0>(holder).container.size(); }
 };
 }  // namespace detail
 

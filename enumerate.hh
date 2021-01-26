@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iterator>
+
 #include "traits.hh"
 
 namespace it {
@@ -16,12 +18,16 @@ struct EnumerateIterator {
         return *this;
     }
 
+    using difference_type = int;
     using value_type = std::pair<size_t, ReferenceType<It>>;
     using reference = value_type;
+    using pointer = std::add_pointer<value_type>;
+    using iterator_category = std::forward_iterator_tag;
 
     // NOTE: This may return a const or mutable reference depending on the constness of the iterator
     reference operator*() const { return {index, *element}; }
 
+    bool operator==(const EnumerateIterator &rhs) const { return element == rhs.element; }
     bool operator!=(const EnumerateIterator &rhs) const { return element != rhs.element; }
     bool operator<(const EnumerateIterator &rhs) const { return element < rhs.element; }
 };
@@ -34,6 +40,9 @@ struct Enumerate {
     using reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::reverse_iterator>;
     using const_reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
 
+    using value_type = std::pair<size_t, ReferenceType<iterator>>;
+    using reference = std::reference_wrapper<value_type>;
+
     iterator begin() { return {0, container.begin()}; }
     iterator end() { return {container.size(), container.end()}; }
     const_iterator cbegin() const { return {0, container.cbegin()}; }
@@ -42,6 +51,7 @@ struct Enumerate {
     reverse_iterator rend() { return {container.size(), container.rend()}; }
     const_reverse_iterator crbegin() const { return {0, container.crbegin()}; }
     const_reverse_iterator crend() const { return {container.size(), container.crend()}; }
+    size_t size() const { return container.size(); }
 
     Container container;
 };
@@ -54,6 +64,9 @@ struct Enumerate<const Container &> {
     using reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
     using const_reverse_iterator = EnumerateIterator<typename std::decay_t<Container>::const_reverse_iterator>;
 
+    using value_type = std::pair<size_t, ReferenceType<iterator>>;
+    using reference = std::reference_wrapper<value_type>;
+
     iterator begin() const { return {0, container.begin()}; }
     iterator end() const { return {container.size(), container.end()}; }
     const_iterator cbegin() const { return {0, container.cbegin()}; }
@@ -62,6 +75,7 @@ struct Enumerate<const Container &> {
     reverse_iterator rend() const { return {container.size(), container.crend()}; }
     const_reverse_iterator crbegin() const { return {0, container.crbegin()}; }
     const_reverse_iterator crend() const { return {container.size(), container.crend()}; }
+    size_t size() const { return container.size(); }
 
     const Container &container;
 };
