@@ -1,3 +1,2 @@
 *.sw[o, p]
-main
-test
+/bazel-*
