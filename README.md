@@ -55,7 +55,8 @@ for (auto [i, data_element] : it::enumerate_copy(data)) {...}
 
 Another cool feature of the library is `it::reverse()`. Instead of making copies, or dealing with awkward indexing, how about:
 ```
-#include ""
+#include "iterate/reverse.hh"
+...
 std::vector<DataType> process_backwards = ...;
 for (const DataType& data : it::reverse(process_backwards))
 {
@@ -65,6 +66,6 @@ for (const DataType& data : it::reverse(process_backwards))
 
 ## Notes
  - The header `iterate.hh` includes all functionality
- - Generally functions and be composed: `it::enumerate(it::zip(a, b))`, for example.
- - Currently this only supports C++17 and up.
- - I'm using bazel for this but since it's header only, including `iterate.hh` is all that's needed.
+ - Generally functions and be composed, for example: `it::enumerate(it::zip(a, b))`
+ - Currently this only supports C++17 and up
+ - I'm using bazel for this, but since it's header only including `iterate.hh` should be all that's needed
