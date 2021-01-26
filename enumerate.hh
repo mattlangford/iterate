@@ -24,11 +24,9 @@ struct EnumerateIterator {
 template <typename Container>
 struct Enumerate {
     using iterator = EnumerateIterator<IteratorType<Container>>;
-    iterator begin() const { return iterator{0, begin_it}; }
-    iterator end() const { return iterator{0, end_it}; }
-
-    IteratorType<Container> begin_it;
-    IteratorType<Container> end_it;
+    iterator begin() const { return iterator{0, container.begin()}; }
+    iterator end() const { return iterator{0, container.end()}; }
+    Container& container;
 };
 }  // namespace detail
 
@@ -37,10 +35,10 @@ struct Enumerate {
 ///
 template <typename Container>
 detail::Enumerate<Container> enumerate(Container &container) {
-    return {container.begin(), container.end()};
+    return {container};
 }
 template <typename Container>
-detail::Enumerate<Container> enumerate(const Container &container) {
-    return {container.cbegin(), container.cend()};
+detail::Enumerate<Container> enumerate(Container &&container) {
+    return {container};
 }
 }  // namespace it
