@@ -71,5 +71,4 @@ for (const DataType& data : it::reverse(process_backwards))
  - I'm using bazel for this, but since it's header only including `iterate.hh` should be all that's needed
 
 ## TODO
- - Need to check the number of copies/moves to try to keep those both to zero
  - `it::append()` which would iterate over each thing one at a time (like a double for loop)

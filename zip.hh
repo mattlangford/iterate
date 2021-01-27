@@ -82,7 +82,8 @@ struct ContainerWrapper<const Container &> {
 
 template <typename... Container>
 struct Zip {
-    Zip(Container... containers) : holder{std::make_tuple(ContainerWrapper<Container>{containers}...)} {
+    Zip(Container... containers)
+        : holder{std::make_tuple(ContainerWrapper<Container>{std::forward<Container>(containers)}...)} {
         // TODO: If the containers passed in are different sizes, things will go very poorly. Probably good to add a
         // way to handle that better than exceptions?
         auto throw_if_wrong_size = [this](const auto &el) {

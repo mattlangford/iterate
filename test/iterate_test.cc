@@ -14,6 +14,26 @@ struct TestType2 {
     ~TestType2() { j = -1; }  // reset if this gets deconstructed
 };
 
+struct CopyMoveCounter {
+    std::shared_ptr<size_t> copies = std::make_shared<size_t>(0);
+    std::shared_ptr<size_t> moves = std::make_shared<size_t>(0);
+    CopyMoveCounter() = default;
+    CopyMoveCounter(const CopyMoveCounter& rhs) : copies(rhs.copies), moves(rhs.moves) { (*copies)++; }
+    CopyMoveCounter(CopyMoveCounter&& rhs) : copies(rhs.copies), moves(rhs.moves) { (*moves)++; }
+    CopyMoveCounter& operator=(const CopyMoveCounter& rhs) {
+        copies = rhs.copies;
+        moves = rhs.moves;
+        (*copies)++;
+        return *this;
+    }
+    CopyMoveCounter& operator=(CopyMoveCounter&& rhs) {
+        copies = rhs.copies;
+        moves = rhs.moves;
+        (*moves)++;
+        return *this;
+    }
+};
+
 template <typename T>
 constexpr bool kIsConstRef = std::is_const_v<std::remove_reference_t<T>>;
 
@@ -73,4 +93,29 @@ TEST(Iterate, too_much) {
         EXPECT_EQ(i3, i2);
         EXPECT_EQ(in1.i, in5.i);
     }
+}
+
+TEST(Iterate, copy_move) {
+    std::vector<CopyMoveCounter> traced;
+    traced.emplace_back();
+
+    EXPECT_EQ(*traced.front().copies, 0);
+    EXPECT_EQ(*traced.front().moves, 0);
+    for (auto res : it::zip(it::reverse(traced), it::enumerate(traced))) {
+        (void)res;
+    }
+    EXPECT_EQ(*traced.front().copies, 0);
+    EXPECT_EQ(*traced.front().moves, 0);
+
+    for (auto res : it::enumerate_copy(traced)) {
+        (void)res;
+    }
+    EXPECT_EQ(*traced.front().copies, 1);
+    EXPECT_EQ(*traced.front().moves, 0);
+
+    for (auto res : it::zip_copy(traced, traced)) {
+        (void)res;
+    }
+    EXPECT_EQ(*traced.front().copies, 3);
+    EXPECT_EQ(*traced.front().moves, 0);
 }
